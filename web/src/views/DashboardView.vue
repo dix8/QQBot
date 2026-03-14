@@ -6,6 +6,7 @@ import { apiFetch, isAuthError } from '@/api/client'
 import { useAdminWs } from '@/composables/useAdminWs'
 import { RefreshCw, Bot as BotIcon } from 'lucide-vue-next'
 import { displayBotName } from '@/utils/bot'
+import { toast } from 'vue-sonner'
 
 interface BotOverview {
   id: number
@@ -128,7 +129,12 @@ async function fetchData() {
       stopFallbackPolling()
       return
     }
-    error.value = e instanceof Error ? e.message : '请求失败'
+    const msg = e instanceof Error ? e.message : '请求失败'
+    if (msg === '请先修改默认密码') {
+      toast.warning('当前使用默认密码，请先修改密码')
+    } else {
+      error.value = msg
+    }
   } finally {
     loading.value = false
   }
