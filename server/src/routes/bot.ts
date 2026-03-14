@@ -121,29 +121,27 @@ export function botRoutes(
       return reply.code(400).send({ error: 'wsPort 须为 1-65535' });
     }
 
-    if (!wsToken) {
-      return reply.code(400).send({ error: 'Access Token 不能为空，请设置鉴权 Token' });
-    }
-
     const result = db.insert(schema.bots)
       .values({
         wsHost,
         wsPort,
-        wsToken,
-        enabled: 1,
+        wsToken: wsToken || '',
+        enabled: wsToken ? 1 : 0,
       })
       .run();
 
     const botId = Number(result.lastInsertRowid);
 
-    // Start reverse WS server for this bot
-    try {
-      await reverseWsManager.startServer(botId, wsHost, wsPort, wsToken);
-    } catch (err) {
-      // If server fails to start (e.g. port conflict), delete the bot record and return error
-      db.delete(schema.bots).where(eq(schema.bots.id, botId)).run();
-      const message = err instanceof Error ? err.message : 'WS 服务启动失败';
-      return reply.code(400).send({ error: message });
+    // Start reverse WS server for this bot (only if token is set)
+    if (wsToken) {
+      try {
+        await reverseWsManager.startServer(botId, wsHost, wsPort, wsToken);
+      } catch (err) {
+        // If server fails to start (e.g. port conflict), delete the bot record and return error
+        db.delete(schema.bots).where(eq(schema.bots.id, botId)).run();
+        const message = err instanceof Error ? err.message : 'WS 服务启动失败';
+        return reply.code(400).send({ error: message });
+      }
     }
 
     auditService.log('bot_create', String(botId), `创建机器人 ${wsHost}:${wsPort}`, (request.user as { username?: string })?.username, request.ip);

@@ -394,10 +394,6 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <div v-if="store.error" class="text-sm text-destructive py-4">
-      {{ store.error }}
-    </div>
-
     <div v-if="store.loading && store.bots.length === 0" class="text-sm text-muted-foreground">
       加载中...
     </div>
