@@ -501,13 +501,13 @@ onUnmounted(() => {
             <Input v-model.number="addPort" type="number" placeholder="8095" />
           </div>
           <div class="space-y-2">
-            <Label>Access Token（必填）</Label>
+            <Label>Access Token（选填）</Label>
             <Input v-model="addToken" placeholder="用于 NapCat 反向 WS 鉴权" />
           </div>
         </div>
         <DialogFooter>
           <Button variant="outline" @click="addOpen = false">取消</Button>
-          <Button @click="handleAdd" :disabled="adding || !addHost || !addPort || !addToken">
+          <Button @click="handleAdd" :disabled="adding || !addHost || !addPort">
             {{ adding ? '添加中...' : '添加' }}
           </Button>
         </DialogFooter>
