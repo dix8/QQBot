@@ -1,0 +1,44 @@
+# Dependencies
+node_modules
+**/node_modules
+
+# Build output
+server/dist
+web/dist
+
+# Database
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+
+# Runtime data
+server/data
+web/data
+
+# Environment
+.env
+.env.*
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Reference project (not needed in image)
+参考项目/
+
+# Release build
+release/
+
+# Documentation
+*.md
+!README.md

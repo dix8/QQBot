@@ -1,0 +1,15 @@
+name: qqbot
+
+services:
+  qqbot-web:
+    build: .
+    container_name: qqbot
+    restart: unless-stopped
+    ports:
+      - "3000:3000" # Web 管理面板端口
+      - "8095:8095" # NapCat 反向 WebSocket 端口（可按需修改）
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      - ./qqbot-data:/app/data
+      - /etc/localtime:/etc/localtime:ro

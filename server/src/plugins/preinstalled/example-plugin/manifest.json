@@ -1,0 +1,193 @@
+{
+  "id": "qqbot_plugin_example",
+  "name": "示例插件",
+  "version": "1.0.0",
+  "description": "演示所有插件能力的示例插件，可自由开关或删除",
+  "author": "System",
+  "repo": "https://github.com/YourName/qqbot-plugin-example",
+  "entry": "index.js",
+  "permissions": ["sendMessage", "callApi", "getConfig", "setConfig"],
+  "commands": [
+    { "command": "/菜单", "description": "查看示例插件所有可用指令", "permission": "all", "aliases": ["/menu"] },
+    { "command": "/ping", "description": "回复 pong，测试 Bot 是否在线", "permission": "all" },
+    { "command": "/echo", "description": "复读消息内容", "usage": "/echo <内容>", "permission": "all" },
+    { "command": "/info", "description": "查看 Bot 基本信息", "permission": "all" },
+    { "command": "/time", "description": "查看当前时间和调用次数", "permission": "all" },
+    { "command": "/赞我", "description": "给你的名片点赞", "permission": "all", "aliases": ["/赞", "/点赞"] },
+    { "command": "/签到", "description": "每日签到", "permission": "all" },
+    { "command": "/签到排行", "description": "查看本群签到排行", "permission": "all" },
+    { "command": "/禁言", "description": "禁言群成员", "usage": "/禁言 @用户/QQ号 [分钟数]", "permission": "master" },
+    { "command": "/解禁", "description": "解除群成员禁言", "usage": "/解禁 @用户/QQ号", "permission": "master" },
+    { "command": "/踢", "description": "踢出群成员", "usage": "/踢 @用户/QQ号", "permission": "master" },
+    { "command": "/全员禁言", "description": "开启全员禁言", "permission": "master" },
+    { "command": "/解除全员禁言", "description": "关闭全员禁言", "permission": "master" },
+    { "command": "/群名片", "description": "设置群成员名片", "usage": "/群名片 @用户/QQ号 新名片", "permission": "master" },
+    { "command": "/功能列表", "description": "查看所有可开关功能及当前状态", "permission": "master" },
+    { "command": "/开启", "description": "开启指定功能", "usage": "/开启 <功能名>", "permission": "master" },
+    { "command": "/关闭", "description": "关闭指定功能", "usage": "/关闭 <功能名>", "permission": "master" },
+    { "command": "/群公告", "description": "发布群公告", "usage": "/群公告 <内容>", "permission": "master" },
+    { "command": "/改群名", "description": "修改群名", "usage": "/改群名 <新群名>", "permission": "master" },
+    { "command": "/设管理", "description": "设置群管理员", "usage": "/设管理 @用户/QQ号", "permission": "master" },
+    { "command": "/取消管理", "description": "取消群管理员", "usage": "/取消管理 @用户/QQ号", "permission": "master" },
+    { "command": "/头衔", "description": "设置群专属头衔", "usage": "/头衔 @用户/QQ号 <头衔>", "permission": "master" },
+    { "command": "/退群", "description": "退出指定群聊", "usage": "/退群 [群号]", "permission": "master" },
+    { "command": "/撤回", "description": "撤回消息（回复要撤回的消息）", "permission": "master" },
+    { "command": "/群历史", "description": "查看群历史消息", "usage": "/群历史 [数量]", "permission": "master" },
+    { "command": "/群列表", "description": "查看 Bot 加入的群列表", "permission": "master" },
+    { "command": "/群成员", "description": "查看本群成员统计", "permission": "master" },
+    { "command": "/好友列表", "description": "查看 Bot 好友列表", "permission": "master" },
+    { "command": "/查群员", "description": "查看群成员详细信息", "usage": "/查群员 @用户/QQ号", "permission": "all" },
+    { "command": "/查用户", "description": "查看用户信息", "usage": "/查用户 <QQ号>", "permission": "all" },
+    { "command": "/群荣誉", "description": "查看本群荣誉信息", "permission": "all" },
+    { "command": "/已读", "description": "标记消息已读", "permission": "all" },
+    { "command": "/群文件", "description": "查看群文件列表", "permission": "all" },
+    { "command": "/群文件信息", "description": "查看群文件系统信息", "permission": "all" }
+  ],
+  "configSchema": [
+    {
+      "key": "enableGroupAdmin",
+      "label": "群管理指令",
+      "type": "boolean",
+      "default": true,
+      "description": "启用 /禁言、/解禁、/踢、/全员禁言、/解除全员禁言、/群名片 指令（仅主人可用）"
+    },
+    {
+      "key": "enableWelcome",
+      "label": "入群欢迎",
+      "type": "boolean",
+      "default": true,
+      "description": "新成员入群时发送欢迎消息"
+    },
+    {
+      "key": "welcomeMsg",
+      "label": "入群欢迎语",
+      "type": "string",
+      "default": "欢迎加入！",
+      "placeholder": "新成员入群时发送的消息"
+    },
+    {
+      "key": "enableLeaveNotice",
+      "label": "退群通知",
+      "type": "boolean",
+      "default": true,
+      "description": "成员退群或被踢时发送通知"
+    },
+    {
+      "key": "enablePokeReply",
+      "label": "戳一戳回应",
+      "type": "boolean",
+      "default": true,
+      "description": "被戳一戳时自动回复"
+    },
+    {
+      "key": "pokeReplies",
+      "label": "戳一戳回复语",
+      "type": "string",
+      "default": "别戳了！|戳你一下！|干嘛戳我 >_<|再戳就坏了！|你好呀~",
+      "description": "多条用 | 分隔，随机选取一条回复"
+    },
+    {
+      "key": "enableAntiRecall",
+      "label": "防撤回",
+      "type": "boolean",
+      "default": false,
+      "description": "开启后，消息被撤回时自动转发原始内容（群聊+私聊）"
+    },
+    {
+      "key": "enableAdminNotice",
+      "label": "管理员变动通知",
+      "type": "boolean",
+      "default": true,
+      "description": "群管理员设置或取消时发送通知"
+    },
+    {
+      "key": "enableBanNotice",
+      "label": "禁言通知",
+      "type": "boolean",
+      "default": true,
+      "description": "群成员被禁言或解禁时发送通知"
+    },
+    {
+      "key": "enableFriendWelcome",
+      "label": "新好友欢迎",
+      "type": "boolean",
+      "default": true,
+      "description": "有新好友添加时自动发送私聊欢迎消息"
+    },
+    {
+      "key": "friendWelcomeMsg",
+      "label": "新好友欢迎语",
+      "type": "string",
+      "default": "你好！很高兴认识你~",
+      "placeholder": "新好友添加后发送的消息"
+    },
+    {
+      "key": "enableFileNotice",
+      "label": "群文件上传通知",
+      "type": "boolean",
+      "default": false,
+      "description": "有人上传群文件时发送通知"
+    },
+    {
+      "key": "enableHonorNotice",
+      "label": "荣誉变更通知",
+      "type": "boolean",
+      "default": true,
+      "description": "龙王、群聊之火等荣誉变更时发送通知"
+    },
+    {
+      "key": "enableRepeat",
+      "label": "复读检测",
+      "type": "boolean",
+      "default": false,
+      "description": "群内连续相同消息达到阈值时自动跟读一次"
+    },
+    {
+      "key": "repeatThreshold",
+      "label": "复读阈值",
+      "type": "number",
+      "default": 3,
+      "description": "连续相同消息达到此数量时触发复读"
+    },
+    {
+      "key": "enableCheckin",
+      "label": "每日签到",
+      "type": "boolean",
+      "default": false,
+      "description": "开启 /签到 指令，每日限一次，数据持久化"
+    },
+    {
+      "key": "enableScheduledMsg",
+      "label": "定时消息",
+      "type": "boolean",
+      "default": false,
+      "description": "按配置的时间和群号定时发送消息"
+    },
+    {
+      "key": "scheduledMessages",
+      "label": "定时消息配置",
+      "type": "string",
+      "default": "[]",
+      "description": "支持每日定时和 Cron 表达式两种模式，群号填 all 发送到所有启用群，支持多条随机消息",
+      "placeholder": "[{\"type\":\"cron\",\"cron\":\"0 9 * * 1-5\",\"group_ids\":[\"all\"],\"message\":\"工作日早安\"}]",
+      "editor": "scheduled-messages"
+    },
+    {
+      "key": "echoMode",
+      "label": "复读模式",
+      "type": "select",
+      "default": "text",
+      "options": [
+        { "label": "纯文本", "value": "text" },
+        { "label": "原样转发", "value": "raw" }
+      ]
+    },
+    {
+      "key": "maxEchoLen",
+      "label": "最大复读长度",
+      "type": "number",
+      "default": 100,
+      "description": "超过此长度的消息不复读"
+    }
+  ]
+}
