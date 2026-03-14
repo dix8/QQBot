@@ -98,7 +98,7 @@ export class ReverseWsManager {
         ? authHeader.slice(7)
         : queryToken;
 
-      if (!wsToken || token !== wsToken) {
+      if (wsToken && token !== wsToken) {
         this.logger.warn(
           { botId, ip: request.socket.remoteAddress },
           'Reverse WS: auth failed',
