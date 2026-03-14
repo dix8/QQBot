@@ -27,7 +27,7 @@ const store = useBotsStore()
 
 // --- Add dialog ---
 const addOpen = ref(false)
-const addHost = ref('127.0.0.1')
+const addHost = ref('0.0.0.0')
 const addPort = ref(8095)
 const addToken = ref('')
 const adding = ref(false)
@@ -41,7 +41,7 @@ async function handleAdd() {
       wsToken: addToken.value,
     })
     addOpen.value = false
-    addHost.value = '127.0.0.1'
+    addHost.value = '0.0.0.0'
     addPort.value = 8095
     addToken.value = ''
     toast.success('机器人添加成功')
@@ -490,7 +490,7 @@ onUnmounted(() => {
         <div class="space-y-4 py-4">
           <div class="space-y-2">
             <Label>反向 WebSocket 主机</Label>
-            <Input v-model="addHost" placeholder="127.0.0.1" />
+            <Input v-model="addHost" placeholder="0.0.0.0" />
           </div>
           <div class="space-y-2">
             <Label>反向 WebSocket 端口</Label>
