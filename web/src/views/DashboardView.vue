@@ -131,7 +131,9 @@ async function fetchData() {
     }
     const msg = e instanceof Error ? e.message : '请求失败'
     if (msg === '请先修改默认密码') {
+      stopFallbackPolling()
       toast.warning('当前使用默认密码，请先修改密码')
+      return
     } else {
       error.value = msg
     }
