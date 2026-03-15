@@ -18,6 +18,7 @@ import { logRoutes } from './routes/log.js';
 import { groupRoutes } from './routes/groups.js';
 import { pluginRoutes } from './routes/plugin.js';
 import { botRoutes } from './routes/bot.js';
+import { promanRoutes } from './routes/proman.js';
 import { registerJwt } from './plugins/jwt.js';
 import { registerAuthHook } from './plugins/auth-hook.js';
 import { authService } from './services/auth.js';
@@ -119,6 +120,7 @@ logRoutes(fastify);
 pluginRoutes(fastify, pluginManager);
 botRoutes(fastify, ws.connectionManager, ws.reverseWsManager);
 groupRoutes(fastify, ws.connectionManager, ws.oneBotClient, ws.reverseWsManager);
+promanRoutes(fastify);
 
 // Static file serving — serve frontend build in production
 const __dirname = path.dirname(fileURLToPath(import.meta.url));

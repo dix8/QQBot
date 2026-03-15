@@ -1,10 +1,15 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { apiFetch, isAuthError } from '@/api/client'
 import { useAdminWs } from '@/composables/useAdminWs'
-import { RefreshCw, Bot as BotIcon } from 'lucide-vue-next'
+import { checkUpdate, getAnnouncements } from '@/api/proman'
+import type { UpdateCheckResult, ProManAnnouncement } from '@/types/proman'
+import { marked } from 'marked'
+import DOMPurify from 'dompurify'
+import { RefreshCw, Bot as BotIcon, ArrowUpCircle, Megaphone, Pin, ChevronDown, ChevronUp, X } from 'lucide-vue-next'
 import { displayBotName } from '@/utils/bot'
 import { toast } from 'vue-sonner'
 
@@ -158,6 +163,8 @@ async function switchRange(range: '24h' | '7d' | '30d') {
 
 onMounted(() => {
   fetchData()
+  fetchUpdateCheck()
+  fetchLatestAnnouncements()
   wsOn('stats:update', onStatsUpdate)
   wsOn('health:update', onHealthUpdate)
   if (!wsConnected.value) {
@@ -209,6 +216,51 @@ const dailyMax = computed(() => {
   if (!stats.value?.daily) return 1
   return Math.max(1, ...stats.value.daily.map(b => Math.max(b.received, b.sent)))
 })
+
+// --- ProMan: update check & announcements ---
+const updateInfo = ref<UpdateCheckResult | null>(null)
+const updateDismissed = ref(false)
+const announcements = ref<ProManAnnouncement[]>([])
+const announcementsExpanded = ref(false)
+
+async function fetchUpdateCheck() {
+  try {
+    updateInfo.value = await checkUpdate()
+  } catch {
+    // silent
+  }
+}
+
+async function fetchLatestAnnouncements() {
+  try {
+    const res = await getAnnouncements()
+    announcements.value = res.data ?? []
+  } catch {
+    // silent — don't break dashboard
+  }
+}
+
+function renderMd(src: string): string {
+  return DOMPurify.sanitize(marked.parse(src, { async: false }) as string)
+}
+
+function formatDate(dateStr: string) {
+  try {
+    const d = new Date(dateStr)
+    if (isNaN(d.getTime())) return ''
+    return d.toLocaleDateString('zh-CN')
+  } catch {
+    return ''
+  }
+}
+
+const displayAnnouncements = computed(() => {
+  const sorted = [...announcements.value].sort((a, b) => {
+    if (a.is_pinned !== b.is_pinned) return a.is_pinned ? -1 : 1
+    return new Date(b.published_at).getTime() - new Date(a.published_at).getTime()
+  })
+  return announcementsExpanded.value ? sorted : sorted.slice(0, 2)
+})
 </script>
 
 <template>
@@ -228,6 +280,58 @@ const dailyMax = computed(() => {
         <RefreshCw class="w-4 h-4" :class="{ 'animate-spin': refreshing }" />
       </Button>
     </div>
+
+    <!-- Update banner -->
+    <div
+      v-if="updateInfo?.hasUpdate && !updateDismissed"
+      class="flex items-center gap-3 rounded-lg border border-primary/30 bg-primary/5 p-3"
+    >
+      <ArrowUpCircle class="w-5 h-5 text-primary shrink-0" />
+      <div class="flex-1 text-sm">
+        <span class="font-medium">新版本 v{{ updateInfo.latestVersion }} 已发布</span>
+        <span class="text-muted-foreground ml-1">（当前 v{{ updateInfo.currentVersion }}）</span>
+      </div>
+      <RouterLink to="/about" class="text-sm text-primary hover:underline shrink-0">查看详情</RouterLink>
+      <button class="text-muted-foreground hover:text-foreground shrink-0" @click="updateDismissed = true">
+        <X class="w-4 h-4" />
+      </button>
+    </div>
+
+    <!-- Announcements -->
+    <Card v-if="announcements.length > 0">
+      <CardHeader class="pb-2">
+        <CardTitle class="text-sm font-medium text-muted-foreground flex items-center gap-1.5">
+          <Megaphone class="w-4 h-4" /> 公告
+        </CardTitle>
+      </CardHeader>
+      <CardContent class="space-y-3">
+        <div
+          v-for="(ann, idx) in displayAnnouncements"
+          :key="idx"
+          class="rounded-md border p-3"
+          :class="ann.is_pinned ? 'border-primary/30 bg-primary/5' : ''"
+        >
+          <div class="flex items-center gap-2 mb-2">
+            <Pin v-if="ann.is_pinned" class="w-3.5 h-3.5 text-primary shrink-0" />
+            <span class="font-semibold text-sm">{{ ann.title }}</span>
+            <Badge v-if="ann.is_pinned" variant="default" class="text-[10px] px-1.5 py-0">置顶</Badge>
+            <span class="text-xs text-muted-foreground ml-auto shrink-0">{{ formatDate(ann.published_at) }}</span>
+          </div>
+          <hr class="border-border mb-2" />
+          <div class="text-sm prose prose-sm dark:prose-invert max-w-none" v-html="renderMd(ann.content)" />
+        </div>
+        <Button
+          v-if="announcements.length > 2"
+          variant="ghost"
+          size="sm"
+          class="w-full text-xs"
+          @click="announcementsExpanded = !announcementsExpanded"
+        >
+          <component :is="announcementsExpanded ? ChevronUp : ChevronDown" class="w-3.5 h-3.5 mr-1" />
+          {{ announcementsExpanded ? '收起' : `查看全部 ${announcements.length} 条公告` }}
+        </Button>
+      </CardContent>
+    </Card>
 
     <div v-if="loading" class="text-sm text-muted-foreground">加载中...</div>
     <div v-else-if="error" class="text-sm text-red-500">{{ error }}</div>

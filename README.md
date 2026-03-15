@@ -165,6 +165,7 @@ QQBot/
 | `/插件列表` | 查看已安装插件 | 超级管理员 |
 | `/启用插件 <序号或ID>` | 启用插件 | 超级管理员 |
 | `/禁用插件 <序号或ID>` | 禁用插件 | 超级管理员 |
+| `/检测更新` `/checkupdate` | 检测系统是否有新版本 | 主人 |
 
 ### 配置管理指令
 
@@ -241,6 +242,8 @@ QQBot/
 | `API_TIMEOUT_MS` | OneBot API 调用超时时间（毫秒） | `30000` |
 | `CORS_ORIGIN` | CORS 允许的来源 | `*` |
 | `TRUST_PROXY` | Fastify 反向代理信任设置 | `false` |
+| `PROMAN_API_URL` | ProMan 版本管理 API 地址 | `https://proman.kek1.cn` |
+| `PROMAN_API_TOKEN` | ProMan API 访问令牌 | — |
 | `NODE_ENV` | 运行环境 | `development` |
 
 ## License

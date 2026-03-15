@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "description": "演示所有插件能力的示例插件，可自由开关或删除",
   "author": "System",
-  "repo": "https://github.com/YourName/qqbot-plugin-example",
+  "repo": "https://github.com/dix8/QQBot",
   "entry": "index.js",
   "permissions": ["sendMessage", "callApi", "getConfig", "setConfig"],
   "commands": [

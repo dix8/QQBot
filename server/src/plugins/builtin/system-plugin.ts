@@ -6,6 +6,7 @@ import type { ConfigService } from '../../services/config.js';
 import type { PluginManager } from '../plugin-manager.js';
 import type { BasicConfig, RuntimeConfig } from '../../types/config.js';
 import { DEFAULT_CONFIG } from '../../types/config.js';
+import { promanService } from '../../services/proman.js';
 import os from 'node:os';
 
 export interface SystemPluginDependencies {
@@ -65,6 +66,7 @@ export class SystemPlugin implements PluginInterface {
       { command: '/在线时段', description: '设置在线时段', usage: '/在线时段 [开/关/起始时-结束时]', permission: 'master' },
       { command: '/频率限制', description: '设置消息频率限制', usage: '/频率限制 [开/关/条数 秒数]', permission: 'master' },
       { command: '/重试', description: '开关消息重试', usage: '/重试 [开/关]', permission: 'master' },
+      { command: '/检测更新', description: '检测系统是否有新版本', permission: 'master', aliases: ['/checkupdate'] },
     ];
   }
 
@@ -140,6 +142,8 @@ export class SystemPlugin implements PluginInterface {
         return this.cmdRateLimit(event, connectionId, botId, argStr, args);
       case '/重试':
         return this.cmdRetry(event, connectionId, botId, argStr);
+      case '/检测更新': case '/checkupdate':
+        return this.cmdCheckUpdate(event, connectionId, botId);
     }
   }
 
@@ -251,6 +255,7 @@ export class SystemPlugin implements PluginInterface {
         '/在线时段 [开/关/起始-结束]',
         '/频率限制 [开/关/条数 秒数]',
         '/重试 [开/关]',
+        '/检测更新 — 检测系统新版本',
       );
     }
 
@@ -899,6 +904,25 @@ export class SystemPlugin implements PluginInterface {
 
     this.setRuntime(botId, { ...runtime, retry: { ...rt, enabled: val } });
     await this.reply(event, connectionId, `消息重试已${val ? '开启' : '关闭'}`);
+  }
+
+  // ==================== Update Check ====================
+
+  private async cmdCheckUpdate(event: MessageEvent, connectionId: string, botId: number): Promise<void> {
+    if (!this.requireMaster(event, connectionId, botId)) return;
+
+    try {
+      const result = await promanService.checkUpdate(this.appVersion);
+      if (result.hasUpdate) {
+        await this.reply(event, connectionId,
+          `发现新版本 v${result.latestVersion}\n详细内容请前往管理系统查看`,
+        );
+      } else {
+        await this.reply(event, connectionId, '当前已是最新版本');
+      }
+    } catch {
+      await this.reply(event, connectionId, '检测更新失败，请稍后再试');
+    }
   }
 
   // ==================== Utilities ====================

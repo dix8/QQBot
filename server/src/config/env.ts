@@ -43,4 +43,8 @@ export const env = {
   INITIAL_ADMIN_PASSWORD: process.env.INITIAL_ADMIN_PASSWORD,
   /** Fastify trustProxy setting. Default false. Accepts true/false/number. */
   TRUST_PROXY: envBoolOrNumber('TRUST_PROXY', false),
+  /** ProMan API base URL */
+  PROMAN_API_URL: envStr('PROMAN_API_URL', 'https://proman.kek1.cn'),
+  /** ProMan API bearer token */
+  PROMAN_API_TOKEN: envStr('PROMAN_API_TOKEN', 'BNGeTNuGoe8E0uRhBHGoJhWDG1dV-MnlfydQO4Bz13w'),
 } as const;
