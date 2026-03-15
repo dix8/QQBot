@@ -29,43 +29,48 @@ jobs:
 
           echo "Previous tag: ${PREV_TAG:-none}"
 
-          # 按前缀分类提取提交
-          FEAT=$(git log "$RANGE" --pretty=format:"- %s (%h)" --grep="^feat" --extended-regexp)
-          FIX=$(git log "$RANGE" --pretty=format:"- %s (%h)" --grep="^fix" --extended-regexp)
-          REFACTOR=$(git log "$RANGE" --pretty=format:"- %s (%h)" --grep="^refactor" --extended-regexp)
-          PERF=$(git log "$RANGE" --pretty=format:"- %s (%h)" --grep="^perf" --extended-regexp)
-          DEPRECATE=$(git log "$RANGE" --pretty=format:"- %s (%h)" --grep="^deprecate" --extended-regexp)
-          REMOVE=$(git log "$RANGE" --pretty=format:"- %s (%h)" --grep="^remove\|^delete" --extended-regexp)
-          CHORE=$(git log "$RANGE" --pretty=format:"- %s (%h)" --grep="^chore\|^ci\|^build\|^docs" --extended-regexp)
+          # 获取所有提交信息
+          ALL=$(git log "$RANGE" --pretty=format:"%h|%s")
 
-          # 收集已分类的提交 hash
-          CLASSIFIED=$(git log "$RANGE" --pretty=format:"%h" --grep="^feat\|^fix\|^refactor\|^perf\|^deprecate\|^remove\|^delete\|^chore\|^ci\|^build\|^docs" --extended-regexp)
-          # 获取所有提交
-          ALL_HASHES=$(git log "$RANGE" --pretty=format:"%h")
-          # 筛选未分类的提交
+          FEAT=""
+          FIX=""
+          REFACTOR=""
+          PERF=""
+          DEPRECATE=""
+          REMOVE=""
+          CHORE=""
           OTHER=""
-          for hash in $ALL_HASHES; do
-            if ! echo "$CLASSIFIED" | grep -q "$hash"; then
-              MSG=$(git log -1 --pretty=format:"- %s (%h)" "$hash")
-              OTHER="${OTHER}${MSG}\n"
-            fi
-          done
+
+          while IFS='|' read -r hash subject; do
+            [ -z "$hash" ] && continue
+            line="- ${subject} (${hash})"
+            case "$subject" in
+              feat:*|feat\(*) FEAT="${FEAT}${line}\n" ;;
+              fix:*|fix\(*) FIX="${FIX}${line}\n" ;;
+              refactor:*|refactor\(*) REFACTOR="${REFACTOR}${line}\n" ;;
+              perf:*|perf\(*) PERF="${PERF}${line}\n" ;;
+              deprecate:*|deprecate\(*) DEPRECATE="${DEPRECATE}${line}\n" ;;
+              remove:*|remove\(*|delete:*|delete\(*) REMOVE="${REMOVE}${line}\n" ;;
+              chore:*|chore\(*|ci:*|ci\(*|build:*|build\(*|docs:*|docs\(*) CHORE="${CHORE}${line}\n" ;;
+              *) OTHER="${OTHER}${line}\n" ;;
+            esac
+          done <<< "$ALL"
 
           # 组装 Release Notes
           NOTES=""
-          [ -n "$FEAT" ] && NOTES="${NOTES}## 🚀 Features\n\n${FEAT}\n\n"
-          [ -n "$FIX" ] && NOTES="${NOTES}## 🐛 Bug Fixes\n\n${FIX}\n\n"
-          [ -n "$REFACTOR" ] && NOTES="${NOTES}## ♻️ Refactor\n\n${REFACTOR}\n\n"
-          [ -n "$PERF" ] && NOTES="${NOTES}## ⚡ Performance\n\n${PERF}\n\n"
-          [ -n "$DEPRECATE" ] && NOTES="${NOTES}## ⚠️ Deprecated\n\n${DEPRECATE}\n\n"
-          [ -n "$REMOVE" ] && NOTES="${NOTES}## 🗑️ Removed\n\n${REMOVE}\n\n"
-          [ -n "$CHORE" ] && NOTES="${NOTES}## 📦 Chores\n\n${CHORE}\n\n"
+          [ -n "$FEAT" ] && NOTES="${NOTES}## 🚀 Features\n\n${FEAT}\n"
+          [ -n "$FIX" ] && NOTES="${NOTES}## 🐛 Bug Fixes\n\n${FIX}\n"
+          [ -n "$REFACTOR" ] && NOTES="${NOTES}## ♻️ Refactor\n\n${REFACTOR}\n"
+          [ -n "$PERF" ] && NOTES="${NOTES}## ⚡ Performance\n\n${PERF}\n"
+          [ -n "$DEPRECATE" ] && NOTES="${NOTES}## ⚠️ Deprecated\n\n${DEPRECATE}\n"
+          [ -n "$REMOVE" ] && NOTES="${NOTES}## 🗑️ Removed\n\n${REMOVE}\n"
+          [ -n "$CHORE" ] && NOTES="${NOTES}## 📦 Chores\n\n${CHORE}\n"
           [ -n "$OTHER" ] && NOTES="${NOTES}## 📝 Other Changes\n\n${OTHER}\n"
 
           if [ -n "$PREV_TAG" ]; then
-            NOTES="${NOTES}\n**Full Changelog**: https://github.com/${{ github.repository }}/compare/${PREV_TAG}...${{ github.ref_name }}"
+            NOTES="${NOTES}**Full Changelog**: https://github.com/${{ github.repository }}/compare/${PREV_TAG}...${{ github.ref_name }}"
           else
-            NOTES="${NOTES}\n**Full Changelog**: https://github.com/${{ github.repository }}/commits/${{ github.ref_name }}"
+            NOTES="${NOTES}**Full Changelog**: https://github.com/${{ github.repository }}/commits/${{ github.ref_name }}"
           fi
 
           # 写入文件避免转义问题
