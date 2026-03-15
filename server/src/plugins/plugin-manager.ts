@@ -22,6 +22,7 @@ import type {
 } from '../types/plugin.js';
 import { detectCommands, mergeCommands } from './command-detector.js';
 import type { MessageEvent, NoticeEvent, RequestEvent } from '../types/onebot.js';
+import type { BasicConfig } from '../types/config.js';
 import type { OneBotClient } from '../ws/onebot-client.js';
 import type { ConnectionManager } from '../ws/connection-manager.js';
 
@@ -836,6 +837,27 @@ export class PluginManager {
           if (type === 'private') {
             await this.oneBotClient.sendPrivateMsg(connectionId, target, message, pluginName);
           } else {
+            // Check group filter before sending
+            if (conn.botInfo?.user_id) {
+              const botRow = db.select({ id: schema.bots.id })
+                .from(schema.bots)
+                .where(eq(schema.bots.selfId, conn.botInfo.user_id))
+                .get();
+              if (botRow) {
+                const basic = configService.get<BasicConfig>(botRow.id, 'basic');
+                if (basic?.groupFilterMode && basic.groupFilterMode !== 'none') {
+                  const inList = (basic.groupFilterList ?? []).includes(target);
+                  if (basic.groupFilterMode === 'whitelist' && !inList) {
+                    pluginLogger.warn(`群 ${target} 不在白名单中，跳过发送`);
+                    return;
+                  }
+                  if (basic.groupFilterMode === 'blacklist' && inList) {
+                    pluginLogger.warn(`群 ${target} 在黑名单中，跳过发送`);
+                    return;
+                  }
+                }
+              }
+            }
             await this.oneBotClient.sendGroupMsg(connectionId, target, message, pluginName);
           }
         },
