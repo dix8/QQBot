@@ -469,7 +469,7 @@ onMounted(() => {
               </div>
               <div v-else class="space-y-3">
                 <div
-                  v-for="(logs, type) in groupChangelogs(changelogCache[ver.version])"
+                  v-for="(logs, type) in groupChangelogs(changelogCache[ver.version] ?? [])"
                   :key="type"
                 >
                   <div class="flex items-center gap-2 mb-1.5">
