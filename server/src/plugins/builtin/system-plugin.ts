@@ -41,6 +41,7 @@ export class SystemPlugin implements PluginInterface {
       { command: '/帮助', description: '显示可用指令列表', permission: 'all', aliases: ['/help'] },
       { command: '/状态', description: '查看系统运行状态', permission: 'all', aliases: ['/status'] },
       { command: '/关于', description: '查看当前 Bot 信息', permission: 'all', aliases: ['/about'] },
+      { command: '/检测更新', description: '检测系统是否有新版本', permission: 'master', aliases: ['/checkupdate'] },
       { command: '/昵称', description: '查看/设置 Bot 昵称', usage: '/昵称 [新昵称]', permission: 'master' },
       { command: '/主人列表', description: '列出所有主人 QQ', permission: 'master' },
       { command: '/添加主人', description: '添加主人', usage: '/添加主人 @用户/QQ号', permission: 'super_admin' },
@@ -66,7 +67,6 @@ export class SystemPlugin implements PluginInterface {
       { command: '/在线时段', description: '设置在线时段', usage: '/在线时段 [开/关/起始时-结束时]', permission: 'master' },
       { command: '/频率限制', description: '设置消息频率限制', usage: '/频率限制 [开/关/条数 秒数]', permission: 'master' },
       { command: '/重试', description: '开关消息重试', usage: '/重试 [开/关]', permission: 'master' },
-      { command: '/检测更新', description: '检测系统是否有新版本', permission: 'master', aliases: ['/checkupdate'] },
     ];
   }
 
@@ -89,6 +89,8 @@ export class SystemPlugin implements PluginInterface {
         return this.cmdStatus(event, connectionId);
       case '/关于': case '/about':
         return this.cmdAbout(event, connectionId, botId);
+      case '/检测更新': case '/checkupdate':
+        return this.cmdCheckUpdate(event, connectionId, botId);
       // 主人指令 — 原有
       case '/昵称':
         return this.cmdNickname(event, connectionId, botId, argStr);
@@ -142,8 +144,6 @@ export class SystemPlugin implements PluginInterface {
         return this.cmdRateLimit(event, connectionId, botId, argStr, args);
       case '/重试':
         return this.cmdRetry(event, connectionId, botId, argStr);
-      case '/检测更新': case '/checkupdate':
-        return this.cmdCheckUpdate(event, connectionId, botId);
     }
   }
 
@@ -230,6 +230,7 @@ export class SystemPlugin implements PluginInterface {
       '/帮助 — 显示可用指令列表',
       '/状态 — 查看系统运行状态',
       '/关于 — 查看当前 Bot 信息',
+      '/检测更新 — 检测系统新版本',
     ];
 
     if (isMasterUser) {
@@ -255,7 +256,6 @@ export class SystemPlugin implements PluginInterface {
         '/在线时段 [开/关/起始-结束]',
         '/频率限制 [开/关/条数 秒数]',
         '/重试 [开/关]',
-        '/检测更新 — 检测系统新版本',
       );
     }
 
