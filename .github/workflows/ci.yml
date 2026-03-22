@@ -51,3 +51,22 @@ jobs:
         with:
           context: .
           push: false
+
+  build-win-portable:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: |
+            web/pnpm-lock.yaml
+            server/pnpm-lock.yaml
+
+      - name: Build portable package
+        shell: bash
+        run: bash scripts/build-win.sh
