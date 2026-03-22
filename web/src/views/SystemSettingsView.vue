@@ -259,7 +259,8 @@ async function confirmRestore() {
         <div v-if="auditLoading" class="text-sm text-muted-foreground py-4 text-center">加载中...</div>
         <div v-else-if="auditLogs.length === 0" class="text-sm text-muted-foreground py-4 text-center">暂无审计记录</div>
         <div v-else>
-          <Table>
+          <div class="overflow-x-auto -mx-6 px-6">
+          <Table class="min-w-[540px]">
             <TableHeader>
               <TableRow>
                 <TableHead class="w-32">时间</TableHead>
@@ -273,7 +274,7 @@ async function confirmRestore() {
               <TableRow v-for="entry in auditLogs" :key="entry.id">
                 <TableCell class="text-xs text-muted-foreground whitespace-nowrap">{{ formatTime(entry.createdAt) }}</TableCell>
                 <TableCell>
-                  <span class="text-xs px-1.5 py-0.5 rounded bg-muted font-medium">{{ ACTION_LABELS[entry.action] || entry.action }}</span>
+                  <span class="text-xs px-1.5 py-0.5 rounded bg-muted font-medium whitespace-nowrap">{{ ACTION_LABELS[entry.action] || entry.action }}</span>
                 </TableCell>
                 <TableCell class="text-sm">{{ entry.detail }}</TableCell>
                 <TableCell class="text-sm">{{ entry.username || '-' }}</TableCell>
@@ -281,6 +282,7 @@ async function confirmRestore() {
               </TableRow>
             </TableBody>
           </Table>
+          </div>
           <div class="flex items-center justify-between mt-3">
             <span class="text-xs text-muted-foreground">共 {{ auditTotal }} 条</span>
             <div class="flex gap-2">

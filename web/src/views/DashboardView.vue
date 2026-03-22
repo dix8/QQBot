@@ -314,11 +314,11 @@ const displayAnnouncements = computed(() => {
           <div class="flex items-center gap-2 mb-2">
             <Pin v-if="ann.is_pinned" class="w-3.5 h-3.5 text-primary shrink-0" />
             <span class="font-semibold text-sm">{{ ann.title }}</span>
-            <Badge v-if="ann.is_pinned" variant="default" class="text-[10px] px-1.5 py-0">置顶</Badge>
-            <span class="text-xs text-muted-foreground ml-auto shrink-0">{{ formatDate(ann.published_at) }}</span>
+            <Badge v-if="ann.is_pinned" variant="default" class="text-xs shrink-0 ml-auto">置顶</Badge>
           </div>
           <hr class="border-border mb-2" />
           <div class="text-sm prose prose-sm dark:prose-invert max-w-none" v-html="renderMd(ann.content)" />
+          <div class="text-xs text-muted-foreground mt-2 text-right">{{ formatDate(ann.published_at) }}</div>
         </div>
         <Button
           v-if="announcements.length > 2"

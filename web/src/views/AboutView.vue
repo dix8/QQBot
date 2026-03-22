@@ -513,11 +513,11 @@ onMounted(() => {
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-2 mb-2">
                     <span class="font-semibold text-base">{{ ann.title }}</span>
-                    <Badge v-if="ann.is_pinned" variant="default" class="text-xs">置顶</Badge>
-                    <span class="text-xs text-muted-foreground ml-auto shrink-0">{{ formatDate(ann.published_at) }}</span>
+                    <Badge v-if="ann.is_pinned" variant="default" class="text-xs shrink-0 ml-auto">置顶</Badge>
                   </div>
                   <Separator class="mb-2" />
                   <div class="text-sm prose prose-sm dark:prose-invert max-w-none" v-html="renderMd(ann.content)" />
+                  <div class="text-xs text-muted-foreground mt-2 text-right">{{ formatDate(ann.published_at) }}</div>
                 </div>
               </div>
             </CardContent>
