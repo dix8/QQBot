@@ -149,28 +149,20 @@ async function toggleVersion(version: string) {
 
 const changelogTypeLabels: Record<string, string> = {
   added: '新增',
+  changed: '修改',
   fixed: '修复',
-  changed: '变更',
-  removed: '移除',
+  improved: '优化',
   deprecated: '废弃',
-  security: '安全',
-  feature: '新功能',
-  fix: '修复',
-  improvement: '改进',
-  breaking: '破坏性变更',
+  removed: '移除',
 }
 
 const changelogTypeVariants: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
   added: 'default',
-  feature: 'default',
-  fixed: 'secondary',
-  fix: 'secondary',
   changed: 'outline',
-  improvement: 'outline',
-  removed: 'destructive',
-  breaking: 'destructive',
+  fixed: 'secondary',
+  improved: 'outline',
   deprecated: 'outline',
-  security: 'destructive',
+  removed: 'destructive',
 }
 
 function groupChangelogs(logs: ProManChangelog[]): Record<string, ProManChangelog[]> {
