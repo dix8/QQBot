@@ -72,7 +72,7 @@ export class ReverseWsManager {
     // Handle upgrade manually so WSS errors don't crash the process
     httpServer.on('upgrade', (request, socket, head) => {
       const { pathname } = new URL(request.url ?? '/', `http://${request.headers.host}`);
-      if (pathname === '/ws') {
+      if (pathname.toLowerCase() === '/qqbot') {
         wss.handleUpgrade(request, socket, head, (ws) => {
           wss.emit('connection', ws, request);
         });
@@ -142,8 +142,8 @@ export class ReverseWsManager {
       httpServer.once('error', onError);
       httpServer.listen(wsPort, wsHost, () => {
         httpServer.removeListener('error', onError);
-        this.logger.info(`Reverse WS server for bot ${botId} listening on ws://${wsHost}:${wsPort}/ws`);
-        logService.addLog('info', 'connection', `反向 WS 服务启动: botId=${botId} ws://${wsHost}:${wsPort}/ws`);
+        this.logger.info(`Reverse WS server for bot ${botId} listening on ws://${wsHost}:${wsPort}/qqbot`);
+        logService.addLog('info', 'connection', `反向 WS 服务启动: botId=${botId} ws://${wsHost}:${wsPort}/qqbot`);
         resolve();
       });
     });

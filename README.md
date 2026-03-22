@@ -116,7 +116,7 @@ QQBot/
 
 ### 连接 NapCat
 
-1. 在 NapCat 配置中设置反向 WebSocket 地址为 `ws://your-server:8095/ws`（端口可在 Web 面板中配置）
+1. 在 NapCat 配置中设置反向 WebSocket 地址为 `ws://your-server:8095/qqbot`（端口可在 Web 面板中配置）
 2. 配置 access token（如需要）
 3. NapCat 启动后会自动连接，Web 面板中即可看到 Bot 上线
 
