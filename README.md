@@ -96,7 +96,9 @@ docker run -d --name qqbot -p 3000:3000 -p 8095:8095 -v qqbot-data:/app/data --r
 
 ### 生产部署（Windows 便携包）
 
-在项目根目录执行构建脚本，生成的便携包位于 `release/QQBot/`，复制到目标机器后双击 `start.bat` 即可运行，无需安装 Node.js。
+前往 [Releases](https://github.com/dix8/QQBot/releases) 下载最新的 `QQBot-*-windows-x64.zip`，解压后双击 `start.bat` 即可运行，无需安装 Node.js。
+
+也可从源码手动构建：
 
 ```bash
 bash scripts/build-win.sh
