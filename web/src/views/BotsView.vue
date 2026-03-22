@@ -501,6 +501,12 @@ onUnmounted(() => {
             <Input v-model="addToken" placeholder="用于 NapCat 反向 WS 鉴权" />
           </div>
         </div>
+        <div class="rounded-md border-l-4 border-l-blue-500 border border-border bg-muted/50 px-4 py-3 text-sm">
+          <p class="font-medium mb-1 text-foreground">NapCat 配置提示</p>
+          <p class="text-muted-foreground">添加后，请在 NapCat 的网络配置中添加一个<span class="font-semibold text-foreground">反向 WebSocket</span>，地址填写：</p>
+          <code class="block mt-1.5 px-2 py-1 rounded bg-background border border-border text-foreground text-xs break-all select-all">ws://{{ addHost === '0.0.0.0' ? 'your-server' : addHost }}:{{ addPort }}/qqbot</code>
+          <p class="mt-1.5 text-xs text-muted-foreground">如设置了 Access Token，需在 NapCat 中同步配置。</p>
+        </div>
         <DialogFooter>
           <Button variant="outline" @click="addOpen = false">取消</Button>
           <Button @click="handleAdd" :disabled="adding || !addHost || !addPort">
