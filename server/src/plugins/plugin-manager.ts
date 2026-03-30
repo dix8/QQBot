@@ -272,11 +272,25 @@ export class PluginManager {
     const wasEnabled = existing ? (db.select().from(schema.plugins).where(eq(schema.plugins.id, manifest.id)).get()?.enabled === 1) : false;
     if (existing) {
       await this.unloadPlugin(existing.id);
-      rmSync(pluginDir, { recursive: true, force: true });
+      // Remove old plugin files but preserve data/ directory (plugin runtime data)
+      const dataDirAbs = resolve(pluginDir, 'data');
+      for (const entry of readdirSync(pluginDir)) {
+        const entryPath = join(pluginDir, entry);
+        if (resolve(entryPath) === dataDirAbs) continue;
+        rmSync(entryPath, { recursive: true, force: true });
+      }
     }
 
-    // Copy files to plugin directory
-    cpSync(extractedDir, pluginDir, { recursive: true });
+    // Copy new version files; when updating, skip data/ to preserve plugin runtime data
+    const existingDataDir = resolve(pluginDir, 'data');
+    cpSync(extractedDir, pluginDir, {
+      recursive: true,
+      filter: (src) => {
+        if (!existing) return true;
+        const s = resolve(src);
+        return s !== existingDataDir && !s.startsWith(existingDataDir + sep);
+      },
+    });
 
     const now = nowISO();
     if (existing) {
