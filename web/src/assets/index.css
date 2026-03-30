@@ -59,6 +59,13 @@
   }
 }
 
+/* Fix file input button text invisible in dark mode */
+.dark input[type="file"]::file-selector-button {
+  color: hsl(var(--foreground));
+  background-color: hsl(var(--secondary));
+  border-color: hsl(var(--border));
+}
+
 /* Prose (markdown) colors adapted to shadcn theme */
 .prose {
   --tw-prose-body: hsl(var(--muted-foreground));
