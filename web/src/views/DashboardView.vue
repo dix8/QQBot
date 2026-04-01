@@ -87,7 +87,13 @@ let fallbackTimer: ReturnType<typeof setInterval> | null = null
 const FALLBACK_POLL_MS = 5000
 
 function onStatsUpdate(data: unknown) {
-  stats.value = data as StatsInfo
+  const incoming = data as StatsInfo
+  if (stats.value) {
+    // WS broadcast only contains hourly data; preserve existing daily data
+    stats.value = { ...incoming, daily: incoming.daily ?? stats.value.daily }
+  } else {
+    stats.value = incoming
+  }
   error.value = ''
 }
 
@@ -157,8 +163,14 @@ async function handleRefresh() {
 }
 
 async function switchRange(range: '24h' | '7d' | '30d') {
-  timeRange.value = range
-  await fetchData()
+  try {
+    const rangeParam = range !== '24h' ? `?range=${range}` : ''
+    const s = await apiFetch<StatsInfo>(`/api/stats${rangeParam}`)
+    stats.value = { ...s, daily: s.daily ?? stats.value?.daily }
+    timeRange.value = range
+  } catch {
+    // keep current range on failure
+  }
 }
 
 onMounted(() => {
@@ -440,7 +452,7 @@ const displayAnnouncements = computed(() => {
           <template v-if="timeRange === '24h' && stats.hourly.length > 0">
             <div class="flex items-end gap-[2px] h-32">
               <div v-for="(bucket, i) in stats.hourly" :key="i"
-                class="flex-1 flex flex-col items-center gap-[1px] min-w-0 group relative">
+                class="flex-1 flex flex-col justify-end items-center gap-[1px] h-full min-w-0 group relative">
                 <div class="w-full rounded-t-sm bg-blue-500/80 transition-all duration-300"
                   :style="{ height: (bucket.received / hourlyMax * 100) + '%', minHeight: bucket.received > 0 ? '2px' : '0' }" />
                 <div class="w-full rounded-b-sm bg-emerald-500/80 transition-all duration-300"
@@ -459,9 +471,9 @@ const displayAnnouncements = computed(() => {
 
           <!-- Daily chart (7d / 30d) -->
           <template v-else-if="stats.daily && stats.daily.length > 0">
-            <div class="flex items-end gap-[2px] h-32">
+            <div class="flex justify-end items-end gap-[2px] h-32">
               <div v-for="(bucket, i) in stats.daily" :key="i"
-                class="flex-1 flex flex-col items-center gap-[1px] min-w-0 group relative">
+                class="flex-1 flex flex-col justify-end items-center gap-[1px] h-full min-w-0 max-w-10 group relative">
                 <div class="w-full rounded-t-sm bg-blue-500/80 transition-all duration-300"
                   :style="{ height: (bucket.received / dailyMax * 100) + '%', minHeight: bucket.received > 0 ? '2px' : '0' }" />
                 <div class="w-full rounded-b-sm bg-emerald-500/80 transition-all duration-300"
