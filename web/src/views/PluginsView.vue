@@ -304,11 +304,11 @@ async function openReadmeDialog(plugin: PluginInfo) {
             <p class="text-sm text-muted-foreground">
               插件需包含 manifest.json 文件，定义名称、版本和入口文件。
             </p>
-            <div class="rounded-md bg-amber-100 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-800 p-3">
-              <p class="text-sm text-amber-900 dark:text-amber-200 font-medium">
+            <div class="rounded-md border p-3" style="background: hsl(var(--destructive) / 0.08); border-color: hsl(var(--destructive) / 0.3);">
+              <p class="text-sm font-medium" style="color: hsl(var(--destructive));">
                 安全提示
               </p>
-              <p class="text-xs text-amber-800 dark:text-amber-300 mt-1">
+              <p class="text-xs mt-1" style="color: hsl(var(--destructive) / 0.85);">
                 插件运行在服务端 Node.js 进程中，没有沙箱隔离，拥有与主程序相同的系统权限。请仅安装来自可信来源的插件。
               </p>
             </div>
