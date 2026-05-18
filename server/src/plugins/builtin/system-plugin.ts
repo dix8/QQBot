@@ -299,10 +299,15 @@ export class SystemPlugin implements PluginInterface {
 
     const connections = this.connectionManager.getAllConnections();
     const authenticated = connections.filter((c) => c.state === 'authenticated').length;
+    const currentConn = this.connectionManager.getConnection(connectionId);
+    const onlineDuration = currentConn?.connectedAt
+      ? this.formatUptime(Date.now() - currentConn.connectedAt.getTime())
+      : '未知';
 
     const lines = [
       '=== 系统状态 ===',
       `运行时长: ${uptime}`,
+      `在线时长: ${onlineDuration}`,
       '',
       `CPU: ${cpuModel}`,
       `CPU 核心: ${cpus.length} 核`,
