@@ -84,6 +84,15 @@ git pull && docker compose up -d --build
 
 如需修改端口，编辑 `docker-compose.yml` 中的 `ports` 映射即可。
 
+#### 反向代理部署（nginx / 宝塔反代等）
+
+若在反向代理后运行，需要让后端从 `X-Forwarded-For` 取真实客户端 IP（否则审计日志记录的会是代理或 Docker 网关地址）：
+
+1. 编辑 `docker-compose.yml`，在 `environment` 段取消 `TRUST_PROXY=true` 的注释
+2. 确保反向代理转发 `X-Forwarded-For` 头（nginx / 宝塔默认已配置）
+3. 建议关闭 `3000` 端口的公网暴露（防火墙拦截或改为 `127.0.0.1:3000:3000` 仅绑回环），避免攻击者绕过反代伪造 IP
+4. `docker compose up -d` 重建容器生效
+
 <details>
 <summary>使用 docker run</summary>
 
@@ -243,7 +252,7 @@ QQBot/
 | `HEARTBEAT_TIMEOUT_MS` | NapCat 心跳超时时间（毫秒） | `60000` |
 | `API_TIMEOUT_MS` | OneBot API 调用超时时间（毫秒） | `30000` |
 | `CORS_ORIGIN` | CORS 允许的来源 | `*` |
-| `TRUST_PROXY` | Fastify 反向代理信任设置 | `false` |
+| `TRUST_PROXY` | 反向代理信任设置，开启后从 `X-Forwarded-For` 取真实客户端 IP（审计日志、登录限流） | `false` |
 | `PROMAN_API_URL` | ProMan 版本管理 API 地址 | `https://proman.kek1.cn` |
 | `PROMAN_API_TOKEN` | ProMan API 访问令牌 | — |
 | `NODE_ENV` | 运行环境 | `development` |

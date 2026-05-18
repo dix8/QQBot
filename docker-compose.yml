@@ -10,6 +10,9 @@ services:
       - "8095:8095" # NapCat 反向 WebSocket 端口（可按需修改）
     environment:
       - TZ=Asia/Shanghai
+      # 反向代理（nginx/宝塔反代等）部署时取消下行注释，使审计日志记录真实客户端 IP
+      # 安全提示：仅在前面有可信代理、且 3000 端口未对公网开放时启用
+      # - TRUST_PROXY=true
     volumes:
       - ./qqbot-data:/app/data
       - /etc/localtime:/etc/localtime:ro
